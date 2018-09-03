@@ -111,13 +111,13 @@ function createLoadableComponent(loadFn, options) {
       render: render,
       webpack: null,
       modules: null,
-      noSsr: false,
-      noReport: undefined
+      ssr: true,
+      report: undefined
     },
     options
   );
-  if (opts.noReport === undefined) {
-    opts.noReport = opts.noSsr;
+  if (opts.report === undefined) {
+    opts.report = opts.ssr;
   }
 
   let res = null;
@@ -129,7 +129,7 @@ function createLoadableComponent(loadFn, options) {
     return res.promise;
   }
 
-  if (!opts.noSsr) {
+  if (opts.ssr) {
     ALL_INITIALIZERS.push(init);
 
     if (typeof opts.webpack === "function") {
@@ -171,13 +171,13 @@ function createLoadableComponent(loadFn, options) {
     }
 
     _loadModule() {
-      if (this.context.loadable && Array.isArray(opts.modules) && !opts.noReport) {
+      if (this.context.loadable && Array.isArray(opts.modules) && opts.report) {
         opts.modules.forEach(moduleName => {
-          this.context.loadable.report(moduleName, !opts.noSsr);
+          this.context.loadable.report(moduleName, opts.ssr);
         });
       }
 
-      if (!res.loading || opts.noSsr) {
+      if (!res.loading || !opts.ssr) {
         return;
       }
 
